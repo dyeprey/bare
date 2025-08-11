@@ -4,7 +4,7 @@ A simple Ruby program that simulates a toy robot moving on a 6/6 square grid.
 
 1. **Clone the repository:**
    ```bash
-   git clone
+   git clone git@github.com:dyeprey/bare.git
    cd testbare
    ```
 
