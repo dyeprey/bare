@@ -1,6 +1,5 @@
 current_orientation = :north
 
-$acceptable_orientations = [:n, :e, :s, :w]
 $current_x_position = nil
 $current_y_position = nil
 $current_orientation = :n
@@ -19,23 +18,33 @@ def place(initial_position)
     return
   end
 
-  # Also fix the orientation check
+  # Array index starts at 0, so 6 is 5
+  if (x.to_i > 5 || y.to_i > 5)
+    puts "Values for X and Y should be 0-5"
+    return
+  end
+
   if (![:n, :e, :s, :w].include?(orientation.downcase.to_sym))
     puts "Allowed values for orientations are N, E, S, W"
     return
   end
-
+  
   $current_x_position = x.to_i
   $current_y_position = y.to_i
-  $current_orientation = orientation.to_s
+  $current_orientation = orientation.downcase.to_sym
 end
 
-def move
+def check_placements
   if $current_x_position.nil? || $current_y_position.nil? || $current_orientation.nil?
     puts "Robot not placed, please place the robot by using the PLACE command"
     puts "Example: PLACE 0,0,N"
     return
   end
+  true
+end
+
+def move
+  return unless check_placements
 
   case $current_orientation.downcase.to_sym
   when :n
@@ -51,11 +60,7 @@ def move
 end
 
 def turn_left
-  return if $current_orientation.nil? 
-  current_index = $acceptable_orientations.index($current_orientation.downcase.to_sym)
-
-  new_index = (current_index - 1) % $acceptable_orientations.length
-  $current_orientation = $acceptable_orientations[new_index]
+  return unless check_placements
 
   case $current_orientation.downcase.to_sym
   when :n
@@ -70,7 +75,7 @@ def turn_left
 end
 
 def turn_right
-  return if $current_orientation.nil?
+  return unless check_placements
 
   case $current_orientation.downcase.to_sym
   when :n
@@ -85,29 +90,32 @@ def turn_right
 end
 
 def report
-  puts "#{$current_x_position}, #{$current_y_position}, #{$current_orientation}"
+  puts "#{$current_x_position}, #{$current_y_position}, #{$current_orientation.to_s.upcase}"
 end
 
-while command != "report"
- begin
-  user_input = gets.split(' ')
-  command = user_input[0].downcase
-  
-  case command
-  when 'place'
-    place(user_input[1])
-  when 'move'
-    move
-  when 'right'
-    turn_right
-  when 'left'
-    turn_left
-  when 'report'
-    report
-  else
-    puts 'Command not supported'
+if __FILE__ == $0
+  command = ""
+  while command != "report"
+  begin
+    user_input = gets.split(' ')
+    command = user_input[0].downcase
+    
+    case command
+    when 'place'
+      place(user_input[1])
+    when 'move'
+      move
+    when 'right'
+      turn_right
+    when 'left'
+      turn_left
+    when 'report'
+      report
+    else
+      puts 'Command not supported'
+    end
+  rescue => e
+    puts "Something is wrong"
   end
-rescue => e
-  "Something is wrong"
-end
+  end
 end
